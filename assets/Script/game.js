@@ -1,11 +1,12 @@
 var Ball = require('ball')
 var Score = require('score')
+console.log(Score)
 cc.Class({
     extends: cc.Component,
 
     properties: {
         ball: Ball,
-        _score: Score
+        scores: Score
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -23,8 +24,6 @@ cc.Class({
             }else{
                 this.bodyJump.linearVelocity = cc.v2(-250, 1500)
             }
-
-            this._score.setScore(2)
         }, this)
 
         this.init();
@@ -39,7 +38,7 @@ cc.Class({
         this.score = 0;
         this.directionMove = true;
         this.ball.initBall(this);
-        this._score.initScore(this);
+        this.scores.initScore(this);
         this.initBasketPos()
     },
 
