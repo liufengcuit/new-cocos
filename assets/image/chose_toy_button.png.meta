@@ -1,14 +1,14 @@
 {
   "ver": "1.0.0",
-  "uuid": "8f8aca8d-e850-4911-8b76-2d3c0f516627",
+  "uuid": "0f7d904a-30e4-426e-a4e3-ab96a3b3b02f",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "subMetas": {
-    "moregame": {
+    "chose_toy_button": {
       "ver": "1.0.3",
-      "uuid": "a095a310-eb94-40ff-9941-dac2cbaeea8b",
-      "rawTextureUuid": "8f8aca8d-e850-4911-8b76-2d3c0f516627",
+      "uuid": "08684765-9530-4b97-a5cf-356eb0f590f6",
+      "rawTextureUuid": "0f7d904a-30e4-426e-a4e3-ab96a3b3b02f",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,
@@ -16,10 +16,10 @@
       "offsetY": 0,
       "trimX": 0,
       "trimY": 0,
-      "width": 160,
-      "height": 180,
-      "rawWidth": 160,
-      "rawHeight": 180,
+      "width": 218,
+      "height": 218,
+      "rawWidth": 218,
+      "rawHeight": 218,
       "borderTop": 0,
       "borderBottom": 0,
       "borderLeft": 0,
