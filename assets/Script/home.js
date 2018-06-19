@@ -42,7 +42,7 @@ cc.Class({
 
     update(dt) {
         this.countAd++;
-        if(this.countAd == 300){
+        if(this.countAd == 150){
             this.adMove();
             this.countAd = 0;
         }

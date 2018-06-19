@@ -10,14 +10,24 @@ cc.Class({
         this.count = 0;
         console.log('onLoad--------ball.js')
         this.effectFlag = true;
-    },
-
-    start () {
-
+        this._initPos = false;
+        this.directiveMove = true;
     },
     initBall: function(game) {
         this.game = game;
+        this.initBallType();
         console.log(game)
+    },
+    /**初始化进球类型 */
+    initBallType() {
+        /**初始化碰撞球类型 
+         * ballOne: '擦边球'
+         * ballTwo: '空心球'
+         * ballThree: '高弧度球'
+        */
+        this.ballOne = false;
+        this.ballTwo = false;
+        this.ballThree = false;
     },
     /**尾部特效 */
     ballEffect: function() {
@@ -34,49 +44,45 @@ cc.Class({
 
     /**进球检测 */
     onBeginContact: function (contact, selfCollider, otherCollider) {
-        // if(otherCollider.tag === 20002) {
-        //     this._initPos = true;
-        // }
-        // if(otherCollider.tag === 20001){
-        //     this._initPos = false;
-        // }
+        if(otherCollider.tag === 1002) {
+            this._initPos = false;
+        }
+        if(otherCollider.tag === 1003){
+            this._initPos = true;
+        }
 
-        // //碰到篮筐
-        // if(otherCollider.tag === 4000){
-        //     this.ballOne = true
-        // }
-        // //碰到篮圈
-        // if(otherCollider.tag === 4001){
-        //     this.ballTwo = true
-        // }
+        //碰到篮板
+        if(otherCollider.tag === 1000){
+            this.ballOne = true
+        }
+        //碰到篮圈
+        if(otherCollider.tag === 1004){
+            this.ballTwo = true
+        }
 
-        // //碰到高弧度线
-        // if(otherCollider.tag === 30000){
-        //     this.ballThree = true;
-        // }
+        //碰到高弧度线
+        if(otherCollider.tag === 30000){
+            this.ballThree = true;
+        }
     },
 
     //碰撞后
     onEndContact: function (contact, selfCollider, otherCollider) {
-        // if(otherCollider.tag == 20001 && this._initPos){
-        //     let self = this;
-        //     if(this.directionMove){
-        //         this.basket.moveRight(function() {
-        //             self.cloneBasketMoveRight();
-        //             self.initBasketEffect()
-        //         });
-        //     }else{
-        //         this.cloneMoveRight(function() {
-        //             self.basket.moveLeft()
-        //             self.initBasketEffect();
-        //         });
-        //     }
-            
-           
-        //     this._initPos = false;
-        //     this.setPoint();
-        //     this.directionMove = !this.directionMove;
-        // }
+        if(otherCollider.tag == 1002 && this._initPos){
+
+            if(this.directiveMove){
+                this.game.moveDisappear(this.game.basketRight, function() {
+                    this.game.moveAppear(this.game.basketLeft);
+                }.bind(this));
+            }else{
+                this.game.moveDisappear(this.game.basketLeft, function() {
+                    this.game.moveAppear(this.game.basketRight);
+                }.bind(this));
+            }
+            this.game.directionMove = !this.game.directionMove;
+            this.directiveMove = !this.directiveMove;
+            this._initPos = false;
+        }
     },
 
     update (dt) {

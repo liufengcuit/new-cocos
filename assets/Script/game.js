@@ -27,10 +27,14 @@ cc.Class({
         }, this)
 
         this.init();
+
+        /**设置篮球阴影 */
+        this.shadowWidth = this.node.getChildByName('shadow').width
+        this.shadowHeight = this.node.getChildByName('shadow').height
+        this.y = this.node.getChildByName('shadow').y
     },
 
     init: function() {
-        console.log(this.score)
         this.basketRight = this.node.getChildByName('basket')
         this.basketLeft = this.node.getChildByName('basket-copy')
 
@@ -97,5 +101,24 @@ cc.Class({
         node.runAction(cc.sequence(move, cc.callFunc(function() {
             call();
         })));
+    },
+    update( dt ){
+        let shadow = this.node.getChildByName('shadow');
+        let ball = this.node.getChildByName('basketball')
+        shadow.position = {
+            x: ball.position.x,
+            y: -636
+        }
+
+        if(ball.y > 0 && ball.y < 334){
+            shadow.width = 686/(ball.y - this.y) * this.shadowWidth;
+            shadow.height = 686/(ball.y - this.y) * this.shadowHeight;
+        }else if(ball.y >= 334){
+            shadow.width = this.shadowWidth * 0.5;
+            shadow.height = this.shadowHeight *0.5;
+        }else{
+            shadow.width = this.shadowWidth;
+            shadow.height = this.shadowHeight;
+        }
     }
 });
