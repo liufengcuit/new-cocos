@@ -1,6 +1,6 @@
 var Ball = require('ball')
 var Score = require('score')
-console.log(Score)
+
 cc.Class({
     extends: cc.Component,
 
@@ -37,10 +37,13 @@ cc.Class({
     init: function() {
         this.basketRight = this.node.getChildByName('basket')
         this.basketLeft = this.node.getChildByName('basket-copy')
+        this.basketLeft.zIndex = 20;
+        this.basketRight.zIndex = 20;
+        this.node.getChildByName('basketball').zIndex = 10;
 
-        this.effectIndex = 0;
         this.score = 0;
         this.directionMove = true;
+        this.effectIndex = 0;
         this.ball.initBall(this);
         this.scores.initScore(this);
         this.initBasketPos()
@@ -119,6 +122,41 @@ cc.Class({
         }else{
             shadow.width = this.shadowWidth;
             shadow.height = this.shadowHeight;
+        }
+    },
+    /**篮筐特效 */
+    basketEffect() {
+        let color = {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 255
+        };
+        this.setBasketColor(color);
+        this.directionMove ? 
+            this.basketRight.getChildByName('explosion').getComponent(cc.Animation).play("explosion"):
+            this.basketLeft.getChildByName('explosion').getComponent(cc.Animation).play("explosion");
+    },
+    /**恢复篮筐样式 */
+    recoverBasketEffect() {
+        let color = {
+            r:255,
+            g:255,
+            b:255,
+            a:255
+        }
+        this.setBasketColor(color);
+    },
+    /**设置篮筐颜色 */
+    setBasketColor(color) {
+        if(this.directionMove){
+            this.basketRight.getChildByName('back').color = color;
+            this.basketRight.getChildByName('front').color = color;
+            this.node.getChildByName('effect').color = color;
+        }else{
+            this.basketLeft.getChildByName('back').color = color;
+            this.basketLeft.getChildByName('front').color = color;
+            this.node.getChildByName('effect-copy').color = color;
         }
     }
 });

@@ -3,24 +3,28 @@ cc.Class({
 
     properties: {
     },
-
-    onLoad () {
-        this.scaleProgress()
-        this.countTime(function(res){console.log(res)})
+    onLoad(){
+        this.countTime(12,()=>{
+            console.log('回调函数')
+        })
     },
-    countTime(call) {
-        this.time = this.setTime(39)
+    countTime(level, call) {
+        this.time = this.setTime(level)
 
+        clearInterval(window.timer);
         let bar = this.node.getChildByName('timebar').getComponent(cc.ProgressBar);
         bar.progress = 1;
         window.timer = setInterval(function() {
-            bar.progress = bar.progress.toFixed(4) - 0.0005*16.6/this.time
+            bar.progress = bar.progress.toFixed(4) - 1/(this.time*20)
             if(bar.progress <= 0){
                 clearInterval(window.timer)
                 call(0)
                 console.log('停止计时')
             }
-        }.bind(this),5)
+        }.bind(this),50)
+        setTimeout(()=>{
+            console.log(10)
+        }, 4000)
 
     },
     setTime(level) {
