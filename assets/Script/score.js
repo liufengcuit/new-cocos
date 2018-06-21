@@ -18,11 +18,9 @@ cc.Class({
         this.game = game;
     },
     setScore: function(score) {
-        let before = this.game.score.toString().split('')
+        let before = this.game.beforeScore.toString().split('')
         let beforeLen = before.length;
         let cloneNode = null;
-
-        this.game.score = (this.game.score - 0) + (score-0);
         let arrNum = this.game.score.toString().split('')
         let len = arrNum.length;
 
