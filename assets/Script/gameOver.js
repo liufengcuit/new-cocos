@@ -21,6 +21,7 @@ cc.Class({
             }
             /**完成目标可以抽取时 */
             else{
+                challenge.getChildByName('title').opacity = 0;
                 challenge.getChildByName('chose_toy_button').opacity = 255;
                 challenge.getChildByName('tips').opacity = 0;
                 this.node.getChildByName('btns').active = false;
