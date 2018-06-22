@@ -1,3 +1,5 @@
+const hex_md5 = require('md5');
+
 export default {
     /**登录 */
     login:function(params, call) {
@@ -5,11 +7,11 @@ export default {
     },
     /**检查用户今天是否还能继续挑战 */
     challengeCheck:function(params, call) {
-        return request('v1/game/challenge-check', params, call)
+        return request('/v1/game/challenge-check', params, call)
     },
     /**游戏得分上报 */
     point:function(params, call) {
-        return request('v1/game/point', params, call)
+        return request('/v1/game/point', params, call)
     },
     /**分享请求 */
     share:function(params, call) {
@@ -101,19 +103,19 @@ function request(url, data, call){
     wx.showLoading({
         title: '加载中'
     })
-    data.app_id = 'wx63c58655903676b7'
+    let obj = {};
+    data.app_id = 'wx1ba02068bfd5c994'
     data.version = '1.0.0'
   
     let newData = objKeySort(data);
     let pJson = JSON.stringify(newData) + '3bd5jrqgy897pf9xlpbhoc13uoitz2n0'
-  
     let str = hex_md5(pJson);
     data.sign = str;
 
-    url = "https://test.tupiaopiao.com" +url;
+    url = "https://miniapp.tupiaopiao.com" +url;
     wx.request({
         url: url,
-        data, data,
+        data: data,
         method: 'POST',
         success: function(res){
             wx.hideLoading();

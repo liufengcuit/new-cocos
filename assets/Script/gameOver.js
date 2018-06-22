@@ -1,3 +1,4 @@
+let http = require('http');
 cc.Class({
     extends: cc.Component,
 
@@ -7,6 +8,9 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        let visibleSize = cc.director.getVisibleSize();
+        window.game_height = visibleSize.height;
+        window.game_width = visibleSize.width;
         window.goalScore = 2100;
         /**为普通模式时候 */
         let challenge = this.node.getChildByName('challenge');
@@ -35,6 +39,9 @@ cc.Class({
         this.reliveCard();
         this.moreGame();
         this.extractGift();
+
+
+        this.loadZhuanPan();
     },
     /**回到首页 */
     backHome() {
@@ -68,18 +75,42 @@ cc.Class({
     },
     /**抽取公仔 */
     extractGift() {
+        // cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
+        //     var newNode = cc.instantiate(pre);
+        //     newNode.width = window.game_width;
+        //     newNode.height = window.game_height;
+        //     newNode.position={
+        //         x: window.game_width/2,
+        //         y: window.game_height/2
+        //     }
+        //     cc.director.getScene().addChild(newNode);
+        // })
         this.node.getChildByName('challenge').getChildByName('chose_toy_button').on(cc.Node.EventType.TOUCH_START, function(event){
             console.log('抽取公仔')
-            cc.loader.loadRes("prefab/choujiangZhuan", cc.Prefab, function (err, pre) {
+            cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
                 var newNode = cc.instantiate(pre);
+                newNode.width = window.game_width;
+                newNode.height = window.game_height;
+                newNode.position={
+                    x: window.game_width/2,
+                    y: window.game_height/2
+                }
                 cc.director.getScene().addChild(newNode);
             })
         })
     },
 
     start () {
-
+        
     },
+    /**加载抽奖转盘图片 */
+    loadZhuanPan() {
+        http.point({openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',point: 1200, mode: 1}, res => {
+            console.log(res)
+            window.lotteryImg = res.data.lottery_config.options;
+        })
+    }
+
 
     // update (dt) {},
 });

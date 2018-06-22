@@ -190,4 +190,4 @@ function binl2b64(binarray)
   return str;
 }
 
-window.hex_md5 = hex_md5
+export default hex_md5
