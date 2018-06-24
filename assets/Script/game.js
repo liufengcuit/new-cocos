@@ -16,6 +16,11 @@ cc.Class({
         cc.director.getPhysicsManager().enabled = true;
 
         this.node.on(cc.Node.EventType.TOUCH_START, function(event) {
+            if(this.isProgressEnd() <= 0){
+                this.isClick = false;
+                return false;
+            }
+            this.ball.initBallType();
             this.basketball = this.node.getChildByName('basketball')
             this.bodyJump = this.basketball.getComponent(cc.RigidBody);
             // 设置移动速度
@@ -42,14 +47,18 @@ cc.Class({
         this.node.getChildByName('basketball').zIndex = 10;
 
         this.score = 0;
+        this.beforeScore = 0;
         this.directionMove = true;
         this.effectIndex = 0;
         this.ball.initBall(this);
         this.scores.initScore(this);
-        this.initBasketPos()
+        this.initBasketPos();
+
+        /**判断按钮是否可以被点击 */
+        this.isClick = true;
+        this.isNext = true;
+
     },
-
-
     //初始化篮筐位置
     initBasketPos: function() {
         this.basketLeft.x = -800;
@@ -123,6 +132,19 @@ cc.Class({
             shadow.width = this.shadowWidth;
             shadow.height = this.shadowHeight;
         }
+
+        /**判断是否结束当前比赛 */
+        if(!this.isClick && this.isNext){
+            this.isNext = false;
+            this.nextPage();
+        }
+    },
+    /**进入下一个场景 */
+    nextPage() {
+        window.timeOut = setTimeout(()=> {
+            window.lastScore = this.score;
+            cc.director.loadScene('gameOver');
+        }, 2000);
     },
     /**篮筐特效 */
     basketEffect() {
@@ -158,5 +180,13 @@ cc.Class({
             this.basketLeft.getChildByName('front').color = color;
             this.node.getChildByName('effect-copy').color = color;
         }
+    },
+    /**判断进度条是否已经加载完成 */
+    isProgressEnd() {
+        return this.node.parent.getChildByName('timebar').getChildByName('timebar').getComponent(cc.ProgressBar).progress;
+    },
+    /**设置分数 */
+    setScoreTmp() {
+        this.scores.setScore(this.score);
     }
 });

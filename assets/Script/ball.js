@@ -16,7 +16,6 @@ cc.Class({
         this.ballTypeNum = 0;
         /**关卡 */
         this.level = 1;
-        this.ballType()
     },
     initBall: function(game) {
         this.game = game;
@@ -33,6 +32,8 @@ cc.Class({
         this.ballOne = false;
         this.ballTwo = false;
         this.ballThree = false;
+
+        this.ballTypeNum = 0;
     },
     /**尾部特效 */
     ballEffect: function() {
@@ -55,42 +56,34 @@ cc.Class({
         if(otherCollider.tag === 1003){
             this._initPos = true;
         }
-
         //碰到篮板
         if(otherCollider.tag === 1000){
             this.ballOne = true
         }
         //碰到篮圈
-        if(otherCollider.tag === 1004){
+        if(otherCollider.tag === 1001){
             this.ballTwo = true
         }
-
         //碰到高弧度线
-        if(otherCollider.tag === 30000){
+        if(otherCollider.tag === 1004){
             this.ballThree = true;
         }
     },
 
     //碰撞后
     onEndContact: function (contact, selfCollider, otherCollider) {
+        /**进球判断 */
         if(otherCollider.tag == 1002 && this._initPos){
-            if(this.game.directionMove){
-                this.game.moveDisappear(this.game.basketRight, function() {
-                    this.game.moveAppear(this.game.basketLeft);
-                    this.game.recoverBasketEffect()
-                }.bind(this));
-            }else{
-                this.game.moveDisappear(this.game.basketLeft, function() {
-                    this.game.moveAppear(this.game.basketRight);
-                    this.game.recoverBasketEffect()
-                }.bind(this));
-            }
-            this.game.basketEffect();
-            this.game.directionMove = !this.game.directionMove;
-            this.directiveMove = !this.directiveMove;
             this._initPos = false;
             this.level++;
-            this.setAddScorePos();
+
+            if(this.game.isProgressEnd() <= 0){
+                this.ballTypeNum = 4;
+            }
+            this.progress.countTime(this.level, ()=>{
+                this.game.isClick = true;
+            })
+            this.ballType()
         }
     },
 
@@ -106,7 +99,7 @@ cc.Class({
 
         //判断篮球是否应该添加尾巴效果
         if(this.game.effectIndex >= 2 && this.count %3 === 0 && this.effectFlag){
-            this.ballEffect()
+            this.ballEffect();
         }
     },
     /** 进球类型*/
@@ -167,9 +160,30 @@ cc.Class({
                     self.ballInAnim(node);
                     self.ballTypeNum = 0;
                 });
+                clearTimeout(window.timeOut);
                 this.game.effectIndex++;
             break;
         }
+
+        if(this.game.effectIndex >= 2){
+            this.game.basketEffect();
+        }
+        if(this.game.directionMove){
+            this.game.moveDisappear(this.game.basketRight, function() {
+                this.game.moveAppear(this.game.basketLeft);
+                this.game.recoverBasketEffect()
+            }.bind(this));
+        }else{
+            this.game.moveDisappear(this.game.basketLeft, function() {
+                this.game.moveAppear(this.game.basketRight);
+                this.game.recoverBasketEffect()
+            }.bind(this));
+        }
+        
+        this.game.directionMove = !this.game.directionMove;
+        this.directiveMove = !this.directiveMove;
+
+        this.setAddScorePos();
     },
     /**进球类型动画 */
     ballInAnim(node) {
@@ -191,12 +205,20 @@ cc.Class({
     setAddScorePos() {
         let addPoint = new cc.Node('Point')
         let sp = addPoint.addComponent(cc.Label);
-        
+        let tmpScore = 0;
         if(this.game.effectIndex >= 1){
-            sp.string = '+ '+ this.game.effectIndex 
+            tmpScore = this.game.effectIndex *2;
+            sp.string = '+ '+ tmpScore
         }else{
+            tmpScore = 1;
             sp.string = "+ 1";
         }
+        this.game.beforeScore = this.game.score;
+        this.game.score = this.game.score - 0 + tmpScore
+        console.log(this.game.score)
+
+        /**设置分数 */
+        this.game.setScoreTmp();
         //获取当前篮筐位置
        
         let pos = this.game.directionMove? this.game.basketRight.position: this.game.basketLeft.position;
@@ -206,7 +228,6 @@ cc.Class({
         };
 
         this.node.parent.addChild(addPoint);
-        // return false;
         let move = cc.moveBy(0.8, cc.p(0, 50))
         addPoint.runAction(cc.sequence(cc.spawn(cc.fadeOut(0.8), move), cc.callFunc(function(){
             addPoint.parent = null;
