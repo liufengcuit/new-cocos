@@ -75,13 +75,13 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 32
-      },
-      {
         "__id__": 33
       },
       {
         "__id__": 34
+      },
+      {
+        "__id__": 35
       }
     ],
     "_prefab": null,
@@ -1162,6 +1162,9 @@
       },
       {
         "__id__": 31
+      },
+      {
+        "__id__": 32
       }
     ],
     "_prefab": null,
@@ -1244,6 +1247,15 @@
       }
     ],
     "playOnLoad": true
+  },
+  {
+    "__type__": "f2805efuYxEjbRQ0KidvnPt",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 29
+    },
+    "_enabled": true
   },
   {
     "__type__": "cc.Canvas",

@@ -35,6 +35,13 @@ cc.Class({
             //销毁当前节点
             cc.loader.loadRes("prefab/getGift", function (err, prefab) {
                 let newNodes = cc.instantiate(prefab);
+                newNodes.width = window.game_width;
+                newNodes.height = window.game_height;
+                newNodes.position={
+                    x: 0,
+                    y: 0
+                }
+
                 self.node.parent.addChild(newNodes);
                 self.node.parent = null;
             });

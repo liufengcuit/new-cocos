@@ -88,7 +88,7 @@ cc.Class({
         this.node.getChildByName('challenge').getChildByName('chose_toy_button').on(cc.Node.EventType.TOUCH_START, function(event){
             console.log('抽取公仔')
             cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
-                var newNode = cc.instantiate(pre);
+                let newNode = cc.instantiate(pre);
                 newNode.width = window.game_width;
                 newNode.height = window.game_height;
                 newNode.position={

@@ -148,12 +148,7 @@ cc.Class({
     },
     /**篮筐特效 */
     basketEffect() {
-        let color = {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 255
-        };
+        let color = new cc.Color(0,0,0,255)
         this.setBasketColor(color);
         this.directionMove ? 
             this.basketRight.getChildByName('explosion').getComponent(cc.Animation).play("explosion"):
@@ -161,12 +156,13 @@ cc.Class({
     },
     /**恢复篮筐样式 */
     recoverBasketEffect() {
-        let color = {
-            r:255,
-            g:255,
-            b:255,
-            a:255
-        }
+        let color = new cc.Color(255,255,255,255)
+        // let color = {
+        //     r:255,
+        //     g:255,
+        //     b:255,
+        //     a:255
+        // }
         this.setBasketColor(color);
     },
     /**设置篮筐颜色 */
