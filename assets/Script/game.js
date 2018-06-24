@@ -37,8 +37,8 @@ cc.Class({
     init: function() {
         this.basketRight = this.node.getChildByName('basket')
         this.basketLeft = this.node.getChildByName('basket-copy')
-        this.basketLeft.zIndex = 20;
-        this.basketRight.zIndex = 20;
+        this.node.getChildByName('effect').zIndex = 20;
+        this.node.getChildByName('effect-copy').zIndex = 20;
         this.node.getChildByName('basketball').zIndex = 10;
 
         this.score = 0;
