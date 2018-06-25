@@ -18,15 +18,24 @@ cc.Class({
             openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
         }, result => {
             let len = result.data.length;
-            if(len >= 4){
-                len = 4;
-                this.result = result.data;
-                this.index = 0;
-            }
+            let a = [], b=[],i=0, j=0;
+            result.data.forEach((element,index) => {
+                if(index%4 == 0 && index != 0){
+                    j++;
+                    i=0;
+                    b = [];
+                }
+                b[i] = element;
+                a[j] = b;
+                i++;
+            });
+
+            this.pageIndex = 0;
+            this.pageList = a;
             if(len != 0){
                 self.node.getChildByName('empty').active = false;
                 list.active = true;
-                for(let i=0;i <len; i++){
+                for(let k=0, l = this.pageList[this.pageIndex].length;k <l; k++){
                     (function(data) {
                         cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
                             let newNode = cc.instantiate(pre);
@@ -39,7 +48,7 @@ cc.Class({
                                 }
                             })
                         })
-                    })(result.data[i])
+                    })(this.pageList[this.pageIndex][k])
                 }
             }else{
                 console.log('空空如也')
@@ -59,16 +68,16 @@ cc.Class({
     prevPage() {
         let self = this;
         this.node.getChildByName('prev').on(cc.Node.EventType.TOUCH_START, function(event){
-            if(this.index==0){
+            if(this.pageIndex==0 || this.pageIndex == void 0){
                 wx.showToast({
                     title: '已经是第一页了',
                     icon:'',
                     image: '',
-                    duration: 50
+                    duration: 500
                 })
             }else{
-                this.index--;
-                for(let i=0;i <4; i++){
+                this.pageIndex--;
+                for(let i=0,len = this.pageList[this.pageIndex].length;i <len; i++){
                     (function(data) {
                         cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
                             let newNode = cc.instantiate(pre);
@@ -81,7 +90,7 @@ cc.Class({
                                 }
                             })
                         })
-                    })(this.result[i+this.index*4])
+                    })(this.pageList[this.pageIndex][i])
                 }
             }
         }, this)
@@ -89,35 +98,32 @@ cc.Class({
     /**下一页 */
     nextPage() {
         let self = this;
-        this.node.getChildByName('prev').on(cc.Node.EventType.TOUCH_START, function(event){
-            if(this.index==0){
+        this.node.getChildByName('next').on(cc.Node.EventType.TOUCH_START, function(event){
+            if(this.pageIndex>= this.pageList.length || this.pageIndex == void 0){
                 wx.showToast({
                     title: '没有了',
                     icon:'',
                     image: '',
-                    duration: 50
+                    duration: 500
                 })
             }else{
                 console.log('下一页')
-                // this.index++;
-                // let len = this.result.length;
-                // let i = 0+this.index*4;
-                // // let len = 
-                // for(i;i <4+this.index*4; i++){
-                //     (function(data) {
-                //         cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
-                //             let newNode = cc.instantiate(pre);
-                //             newNode.toysId = data.doll_id;
-                //             newNode.getChildByName('listId').getComponent(cc.Label).string = data.doll_id;
-                //             cc.loader.loadRes(data.img, cc.SpriteFrame, function (err, spriteFrame) {
-                //                 if(spriteFrame){
-                //                     newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = spriteFrame;
-                //                     list.addChild(newNode);
-                //                 }
-                //             })
-                //         })
-                //     })(this.result[i+this.index*4])
-                // }
+                this.pageIndex++;
+                for(let i=0,len = this.pageList[this.pageIndex].length;i <len; i++){
+                    (function(data) {
+                        cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
+                            let newNode = cc.instantiate(pre);
+                            newNode.toysId = data.doll_id;
+                            newNode.getChildByName('listId').getComponent(cc.Label).string = data.doll_id;
+                            cc.loader.loadRes(data.img, cc.SpriteFrame, function (err, spriteFrame) {
+                                if(spriteFrame){
+                                    newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = spriteFrame;
+                                    list.addChild(newNode);
+                                }
+                            })
+                        })
+                    })(this.pageList[this.pageIndex][i])
+                }
             }
         }, this)
     }
