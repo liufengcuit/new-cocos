@@ -14,7 +14,7 @@ cc.Class({
     startGift() {
         let startBtn = this.node.getChildByName('game_box').getChildByName('start')
         startBtn.on(cc.Node.EventType.TOUCH_START, function(event){
-            this.startLottery();
+            this.lottery();
             /**切换按钮图片 start-lottery.png  re-select.png*/
         }, this)
     },
@@ -24,12 +24,15 @@ cc.Class({
         let j = 0;
         for(let i =0;i< 8;i++){
             j++;
-            (function(b){let remoteUrl= window.lotteryImg['doll'+b].url;cc.loader.load(remoteUrl, function (err, texture) {
-                if(texture){
-                    let frame = new cc.SpriteFrame(texture);
-                    self.node.getChildByName('game_box').getChildByName('node'+b).getComponent(cc.Sprite).spriteFrame = frame; 
-                }
-            })})(j);
+            (function(b){
+                let remoteUrl= window.lotteryImg['doll'+b].url;
+                cc.loader.load(remoteUrl, function (err, texture) {
+                    if(texture){
+                        let frame = new cc.SpriteFrame(texture);
+                        self.node.getChildByName('game_box').getChildByName('node'+b).getComponent(cc.Sprite).spriteFrame = frame; 
+                    }
+                })
+            })(j);
         }
     },
     /**转盘转动 */
@@ -67,28 +70,28 @@ cc.Class({
         }
         setTimeout(callback, this.speed)
     },
-    /**开始摇奖 */
-    startLottery() {
-        http.isCanLottery({openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'}, res=>{
-            if(res.data){
+    /**开始摇奖并获取ID */
+    lottery(){
+        let resultConfig = ['系统错误', '成功', '次数超限', '没有挑战记录', '挑战和摇奖不是同一个用户', '挑战没有成功', '重摇次数超限']
+        http.lottery({
+            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
+            log_id: window.log_id
+        }, result => {
+            if(result.data.result == 1){
+                this.no = result.data.doll_key;
                 this.panelMove();
                 startBtn.off(cc.Node.EventType.TOUCH_START);
-                let self = this;
             }else{
                 wx.showModal({
                     title: '',
-                    content: '对不起，今天的摇奖次数已经用完了',
+                    content: resultConfig[result.data.result],
                     showCancel: false,
-                    cancelText: '',
-                    confirmText: '确定',
-                    success:function() {
-                        console.log('确定')
-                    }
+                    cancelText:'',
+                    confirmText: '确定'
                 })
             }
         })
     },
-
     start () {
 
     },

@@ -13,7 +13,7 @@ cc.Class({
     backHome:function(){
         clearInterval(this.time );
         cc.game.removePersistRootNode(this.node);
-        cc.director.loadScene("startGame");
+        cc.director.loadScene("Home");
     },
     onLoad:function(){
         let self = this;

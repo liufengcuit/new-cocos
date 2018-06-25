@@ -8,20 +8,18 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        let visibleSize = cc.director.getVisibleSize();
-        window.game_height = visibleSize.height;
-        window.game_width = visibleSize.width;
-        window.goalScore = 2100;
         /**为普通模式时候 */
         let challenge = this.node.getChildByName('challenge');
-        if(false){
+        challenge.getChildByName('score').getComponent(cc.Label).string = window.lastScore;
+        if(window.gameMode == 2){
             challenge.getChildByName('success').opacity = 0;
             challenge.getChildByName('tips').opacity = 0;
             challenge.getChildByName('goal').opacity = 0;
         }else{
             /**完成目标没有机会抽取时 */
-            if(/*window.lastScore - window.goalScore*/10 <=0){
-                challenge.getChildByName('title').opacity = 0;
+            if(window.lastScore - window.goalScore >=0){
+                challenge.getChildByName('goal').getComponent(cc.Label).string = '距离挑战目标还差\n'+(window.goalScore-window.lastScore)
+                challenge.getChildByName('success').opacity = 0;
             }
             /**完成目标可以抽取时 */
             else{
@@ -32,6 +30,8 @@ cc.Class({
                 this.node.getChildByName('btns').opacity = 0;
             }
         }
+
+        this.node.getChildByName('moregame').active = false;
 
         this.backHome();
         this.againChallenge();
@@ -88,7 +88,7 @@ cc.Class({
         this.node.getChildByName('challenge').getChildByName('chose_toy_button').on(cc.Node.EventType.TOUCH_START, function(event){
             console.log('抽取公仔')
             cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
-                var newNode = cc.instantiate(pre);
+                let newNode = cc.instantiate(pre);
                 newNode.width = window.game_width;
                 newNode.height = window.game_height;
                 newNode.position={
@@ -99,15 +99,68 @@ cc.Class({
             })
         })
     },
-
-    start () {
+    /**广告 */
+    ad() {
+        let self = this;
+        http.ad({
+            position: 2
+        }, result => {
+            if(!result.data){
+                return false;
+            }
+            this.node.getChildByName('moregame').active = true
+            self.previewAdCode = result.data;
+            /**获取成功过后才绑定广告预览事件 */
+            self.previewAd();
+            cc.loader.load(result.data.ad_img, function (err, texture) {
+                if(texture){
+                    let frame = new cc.SpriteFrame(texture);
+                    self.node.getChildByName('moregame').getComponent(cc.Sprite).spriteFrame = frame; 
+                }
+            })
+        })
+    },
+    /**广告预览 */
+    previewAd() {
+        let self = this;
+        this.node.getChildByName('moregame').on(cc.Node.EventType.TOUCH_START, function(event){
+            wx.showLoading({
+                title: '加载中',
+                mask: true
+            })
+            wx.previewImage({
+                urls: [self.previewAdCode.qr_img],
+                complete: function() {
+                    wx.hideLoading();
+                }
+            })
+            
+        }, this)
         
     },
     /**加载抽奖转盘图片 */
     loadZhuanPan() {
-        http.point({openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',point: 1200, mode: 1}, res => {
+        let self = this;
+        let resultConfig = ['系统异常','挑战成功', '挑战成功不摇奖', '挑战失败', '进入挑战模式', '普通模式正常结束']
+        http.point({openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',point: window.lastScore, mode: window.gameMode}, res => {
             console.log(res)
-            window.lotteryImg = res.data.lottery_config.options;
+            
+            if(window.gameMode == 2){
+                self.node.getChildByName('challenge').getChildByName('goal').opacity = 255;
+                self.node.getChildByName('challenge').getChildByName('goal').getComponent(cc.Label).string = '本周最佳：'+res.data.weekbest
+            }else if(res.data.result == 1){
+                window.lotteryImg = res.data.lottery_config.options;
+                window.log_id = res.data.lottery_config.log_id;
+                window.reelect_time = res.data.lottery_config.reelect_time
+            }else{
+                wx.showModal({
+                    title: '',
+                    content: resultConfig[res.data.result],
+                    showCancel: false,
+                    cancelText:'',
+                    confirmText: '确定'
+                })
+            }
         })
     }
 

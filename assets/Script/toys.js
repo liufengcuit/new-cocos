@@ -1,3 +1,4 @@
+let http = require('http');
 cc.Class({
     extends: cc.Component,
     properties: {
@@ -22,10 +23,20 @@ cc.Class({
 
     /**合成公仔 */
     creatToys() {
+        let resultMsg = ['系统错误', '合成成功', '普通娃娃数量不足', '合成失败']
         this.node.getChildByName('button01_toy').on(cc.Node.EventType.TOUCH_START, function(event){
             //销毁当前节点
-            this.node.parent = null;
-            this.node.destroy();
+            http.compose({
+                openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+            }, result => {
+                wx.showModal({
+                    title: '',
+                    content: resultMsg[result.data],
+                    showCancel: false,
+                    cancelText:'',
+                    confirmText: '确定'
+                })
+            })
         }, this)
     },
     /**领取公仔 */
@@ -35,6 +46,12 @@ cc.Class({
             //销毁当前节点
             cc.loader.loadRes("prefab/getGift", function (err, prefab) {
                 let newNodes = cc.instantiate(prefab);
+                newNodes.width = window.game_width;
+                newNodes.height = window.game_height;
+                newNodes.position={
+                    x: 0,
+                    y: 0
+                }
                 self.node.parent.addChild(newNodes);
                 self.node.parent = null;
             });

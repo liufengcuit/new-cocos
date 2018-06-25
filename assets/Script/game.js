@@ -12,9 +12,10 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        /**判断是否需要加载3,2,1倒计时 */
+        this.isLoading();
         /**开启物理组件碰撞系统 */
         cc.director.getPhysicsManager().enabled = true;
-
         this.node.on(cc.Node.EventType.TOUCH_START, function(event) {
             if(this.isProgressEnd() <= 0){
                 this.isClick = false;
@@ -37,6 +38,32 @@ cc.Class({
         this.shadowWidth = this.node.getChildByName('shadow').width
         this.shadowHeight = this.node.getChildByName('shadow').height
         this.y = this.node.getChildByName('shadow').y
+    },
+    isLoading() {
+        let self = this;
+        let ballNode = this.node.parent.getChildByName('level')
+        if(window.gameMode == 1){
+            cc.loader.loadRes("prefab/gameLoadingView", cc.Prefab, function (err, pre) {
+                let newNode = cc.instantiate(pre);
+                newNode.width = window.game_width;
+                newNode.height = window.game_height;
+                newNode.position={
+                    x: window.game_width/2,
+                    y: window.game_height/2
+                }
+                cc.director.getScene().addChild(newNode);
+            })
+            let time = 3
+            let timer = setInterval(function(){
+                time--;
+                if(time == -1){
+                    self.node.getChildByName('basketball').position={x:0,y: 206}
+                    ballNode.destroy();
+                }
+            },1000);
+        }else{
+            ballNode.destroy();
+        }
     },
 
     init: function() {
@@ -144,16 +171,11 @@ cc.Class({
         window.timeOut = setTimeout(()=> {
             window.lastScore = this.score;
             cc.director.loadScene('gameOver');
-        }, 2000);
+        }, 1000);
     },
     /**篮筐特效 */
     basketEffect() {
-        let color = {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 255
-        };
+        let color = new cc.Color(0,0,0,255)
         this.setBasketColor(color);
         this.directionMove ? 
             this.basketRight.getChildByName('explosion').getComponent(cc.Animation).play("explosion"):
@@ -161,12 +183,7 @@ cc.Class({
     },
     /**恢复篮筐样式 */
     recoverBasketEffect() {
-        let color = {
-            r:255,
-            g:255,
-            b:255,
-            a:255
-        }
+        let color = new cc.Color(255,255,255,255)
         this.setBasketColor(color);
     },
     /**设置篮筐颜色 */

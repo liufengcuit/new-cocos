@@ -28,7 +28,7 @@
   "renderMode": "1",
   "startScene": "58fbc0f7-830c-42cd-ad88-d6e37a047698",
   "title": "demo_1",
-  "webOrientation": "auto",
+  "webOrientation": "portrait",
   "wechatgame": {
     "REMOTE_SERVER_ROOT": "",
     "appid": "wx1ba02068bfd5c994",
