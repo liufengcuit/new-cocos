@@ -17,17 +17,30 @@ cc.Class({
             challenge.getChildByName('goal').opacity = 0;
         }else{
             /**完成目标没有机会抽取时 */
-            if(window.lastScore - window.goalScore >=0){
+            if(window.lastScore - window.goalScore < 0){
                 challenge.getChildByName('goal').getComponent(cc.Label).string = '距离挑战目标还差\n'+(window.goalScore-window.lastScore)
                 challenge.getChildByName('success').opacity = 0;
+                challenge.getChildByName('tips').opacity = 0;
             }
             /**完成目标可以抽取时 */
             else{
-                challenge.getChildByName('title').opacity = 0;
-                challenge.getChildByName('chose_toy_button').opacity = 255;
-                challenge.getChildByName('tips').opacity = 0;
-                this.node.getChildByName('btns').active = false;
-                this.node.getChildByName('btns').opacity = 0;
+                challenge.getChildByName('goal').getComponent(cc.Label).string = '挑战目标：'+(window.goalScore)
+                http.isCanLottery({
+                    openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                }, result => {
+                    /**能继续抽奖 */
+                    if(result.data){
+                        challenge.getChildByName('title').opacity = 0;
+                        challenge.getChildByName('chose_toy_button').opacity = 255;
+                        this.node.getChildByName('btns').active = false;
+                        this.node.getChildByName('btns').opacity = 0;
+                    }else{
+                        /**不能参与摇奖 */
+                        challenge.getChildByName('title').opacity = 0;
+                        challenge.getChildByName('tips').opacity = 255;
+                    }
+                })
+                
             }
         }
 
@@ -37,11 +50,13 @@ cc.Class({
         this.againChallenge();
         this.invite();
         this.reliveCard();
-        this.moreGame();
         this.extractGift();
 
 
         this.loadZhuanPan();
+        wx.showShareMenu({
+            withShareTicket: true
+        })
     },
     /**回到首页 */
     backHome() {
@@ -52,25 +67,45 @@ cc.Class({
     /**再次挑战 */
     againChallenge() {
         this.node.getChildByName('btns').getChildByName('button02').on(cc.Node.EventType.TOUCH_START, function(event){
-            cc.director.loadScene('Game');
+            if(window.gameMode == 2){
+                cc.director.loadScene('Game');
+            }else{
+                http.challengeCheck({
+                    openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                }, result => {
+                    if(result.data.result){
+                        cc.director.loadScene('Game');
+                    }else{
+                        wx.showModal({
+                            title: '',
+                            content: "今天的挑战次数已经用完了",
+                            showCancel: false,
+                            cancelText:'',
+                            confirmText: '确定'
+                        })
+                    }
+                })
+            }
+            
         })
     },
     /**邀请好友 */
     invite() {
         this.node.getChildByName('btns').getChildByName('button03').on(cc.Node.EventType.TOUCH_START, function(event){
-            console.log('邀请好友')
+            wx.shareAppMessage({
+                title: '邀请好友',
+                imageUrl: '',
+                query: '',
+                success: function() {
+                    console.log('sdfsf')
+                }
+            })
         })
     },
     /**复活卡 */
     reliveCard() {
         this.node.getChildByName('btns').getChildByName('card_relive').on(cc.Node.EventType.TOUCH_START, function(event){
             console.log('复活卡')
-        })
-    },
-    /**更多游戏 */
-    moreGame() {
-        this.node.getChildByName('moregame').on(cc.Node.EventType.TOUCH_START, function(event){
-            console.log('更多游戏')
         })
     },
     /**抽取公仔 */
@@ -152,18 +187,19 @@ cc.Class({
                 window.lotteryImg = res.data.lottery_config.options;
                 window.log_id = res.data.lottery_config.log_id;
                 window.reelect_time = res.data.lottery_config.reelect_time
-            }else{
-                wx.showModal({
-                    title: '',
-                    content: resultConfig[res.data.result],
-                    showCancel: false,
-                    cancelText:'',
-                    confirmText: '确定'
+            }else if(res.data.result == 4){
+                cc.loader.loadRes("prefab/openChallenge", cc.Prefab, function (err, pre) {
+                    let newNode = cc.instantiate(pre);
+                    newNode.width = window.game_width;
+                    newNode.height = window.game_height;
+                    newNode.position={
+                        x: window.game_width/2,
+                        y: window.game_height/2
+                    }
                 })
+            }else{
+                console.log('挑战失败')
             }
         })
     }
-
-
-    // update (dt) {},
 });

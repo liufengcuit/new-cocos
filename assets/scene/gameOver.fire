@@ -661,7 +661,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 303,
+      "width": 233,
       "height": 42
     },
     "_rotationX": 0,
@@ -696,7 +696,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "挑战目标：2100",
+    "_N$string": "挑战目标：0",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -719,7 +719,7 @@
     ],
     "_prefab": null,
     "_id": "8bvzZDk6pO9r90Z4t5+EmU",
-    "_opacity": 255,
+    "_opacity": 0,
     "_color": {
       "__type__": "cc.Color",
       "r": 153,
@@ -1212,9 +1212,7 @@
       "__id__": 29
     },
     "_enabled": true,
-    "_spriteFrame": {
-      "__uuid__": "a095a310-eb94-40ff-9941-dac2cbaeea8b"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_sizeMode": 1,
     "_fillType": 0,

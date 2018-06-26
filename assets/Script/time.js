@@ -32,7 +32,7 @@ cc.Class({
             return -1
         }else if(level >= 2 && level <= 5){
             this.isScaleStart = 0.3;
-            return 11;
+            return 3;
         }else if(level >= 6 && level <= 10){
             this.isScaleStart = 0.3;
             return 10

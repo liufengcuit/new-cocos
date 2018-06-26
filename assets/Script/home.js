@@ -57,6 +57,12 @@ cc.Class({
                 }
             }
         })
+
+        this.shareConfigs();
+        /**开启微信分享 */
+        wx.showShareMenu({
+            withShareTicket: true
+        })
     },
 
     /*加载我的公仔页面 */
@@ -93,6 +99,7 @@ cc.Class({
 
                 this.config();
                 this.ticket();
+                this.lifeCard();
                 this.explain();
                 this.startChallengeGame();
             }else{
@@ -119,8 +126,9 @@ cc.Class({
             http.ticketCheck({
                 openid: "o7Ocn47Jx_OO0UX0taxAEND4IZGE"
             }, result => {
-                if(!result.data.result){
+                if(result.data.result){
                     window.gameMode = 1;
+                    window.use_lifeCard_num = result.data.use_num;
                     cc.director.loadScene('Game')
                 }else{
                     wx.showModal({
@@ -217,6 +225,21 @@ cc.Class({
             
         }, this)
     },
+    /**复活卡按钮 */
+    lifeCard() {
+        this.node.getChildByName('un_open').getChildByName('buttons').getChildByName('card').getChildByName('recard').on(cc.Node.EventType.TOUCH_START, function(event){
+            cc.loader.loadRes("prefab/lifeCard", cc.Prefab, function (err, pre) {
+                let newNode = cc.instantiate(pre);
+                newNode.width = window.game_width;
+                newNode.height = window.game_height;
+                newNode.position={
+                    x: window.game_width/2,
+                    y: window.game_height/2
+                }
+                cc.director.getScene().addChild(newNode);
+            })
+        }, this)
+    },
     /**说明事件 */
     explain() {
         this.node.getChildByName('un_open').getChildByName('helpbox').getChildByName('help').on(cc.Node.EventType.TOUCH_START, function(event){
@@ -251,7 +274,7 @@ cc.Class({
             openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
         }, result => {
             if(result.data.ticket){
-                cc.loader.loadRes("prefab/openChallenge", cc.Prefab, function (err, pre) {
+                cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {
                     let newNode = cc.instantiate(pre);
                     newNode.width = window.game_width;
                     newNode.height = window.game_height;
@@ -259,7 +282,33 @@ cc.Class({
                         x: window.game_width/2,
                         y: window.game_height/2
                     }
-                    cc.director.getScene().addChild(newNode);
+                    cc.loader.load(result.data.ticket.avatar, function (err, texture) {
+                        if(texture){
+                            let frame = new cc.SpriteFrame(texture);
+                            newNode.getChildByName('headport').getComponent(cc.Sprite).spriteFrame = frame; 
+                            newNode.getChildByName('headport').getChildByName('username').getComponent(cc.Label).string = result.data.ticket.nickname;
+                            cc.director.getScene().addChild(newNode);
+                        }
+                    })
+                }) 
+            }
+            if(result.data.life_card){
+                cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {
+                    let newNode = cc.instantiate(pre);
+                    newNode.width = window.game_width;
+                    newNode.height = window.game_height;
+                    newNode.position={
+                        x: window.game_width/2,
+                        y: window.game_height/2
+                    }
+                    cc.loader.load(result.data.life_card.avatar, function (err, texture) {
+                        if(texture){
+                            let frame = new cc.SpriteFrame(texture);
+                            newNode.getChildByName('headport').getComponent(cc.Sprite).spriteFrame = frame; 
+                            newNode.getChildByName('headport').getChildByName('username').getComponent(cc.Label).string = result.data.life_card.nickname;
+                            cc.director.getScene().addChild(newNode);
+                        }
+                    })
                 }) 
             }
         })
@@ -271,6 +320,33 @@ cc.Class({
         this.node.getChildByName('un_open').active = true;
         /**隐藏入场券复活卡按钮 */
         this.node.getChildByName('un_open').getChildByName('buttons').active = false;
+    },
+    /**获取所有分享配置 */
+    shareConfigs() {
+        let self = this;
+        /**1.默认分享转发 2.首页/群排行-挑战 3.复活卡弹窗邀请好友 4.首页/好友排行-群排行 5.结束页-邀请好友挑战 6.转盘页-炫耀 7.转盘页重选 8.入场券回赠 9复活卡回赠 */
+        http.shareConfigs({}, result => {
+            if(result.data){
+                window.shareConfigs = result.data;
+                self.defaultShare();
+            }
+        })
+    },
+    /**默认分享弹窗 */
+    defaultShare() {
+        wx.onShareAppMessage(() =>{
+            return {
+                title: window.shareConfigs[1].content,
+                imageUrl: window.shareConfigs[1].img
+            }
+        })
+    },
+    /**分享请求，获取clickID */
+    shareClickId() {
+        // http.share({
+        //     openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
+        //     type:
+        // })
     },
     start () {
 

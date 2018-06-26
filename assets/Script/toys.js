@@ -25,17 +25,27 @@ cc.Class({
     creatToys() {
         let resultMsg = ['系统错误', '合成成功', '普通娃娃数量不足', '合成失败']
         this.node.getChildByName('button01_toy').on(cc.Node.EventType.TOUCH_START, function(event){
-            //销毁当前节点
-            http.compose({
-                openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
-            }, result => {
-                wx.showModal({
-                    title: '',
-                    content: resultMsg[result.data],
-                    showCancel: false,
-                    cancelText:'',
-                    confirmText: '确定'
-                })
+            wx.showModal({
+                title: '',
+                content: '确定要合成超级公仔么？',
+                cancelText:'取消',
+                confirmText: '确定',
+                success: function(confirm) {
+                    if(confirm.confirm){
+                        //销毁当前节点
+                        http.compose({
+                            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                        }, result => {
+                            wx.showModal({
+                                title: '',
+                                content: resultMsg[result.data],
+                                showCancel: false,
+                                cancelText:'',
+                                confirmText: '确定'
+                            })
+                        })
+                    }
+                }
             })
         }, this)
     },

@@ -4,16 +4,15 @@ cc.Class({
     properties: {
     },
     copyId(event) {
-        console.log('复制单号')
-        console.log(this.node)
+        let self = this;
         wx.setClipboardData({
-            data: '数据',
+            data: self.node.parent.getChildByName("listId").getComponent(cc.Label).string+'',
             success: function() {
                 wx.showToast({
                     title: '复制成功',
                     icon:'',
                     image: '',
-                    duration: 50
+                    duration: 500
                 })
             },
             fail: function() {
@@ -21,7 +20,7 @@ cc.Class({
                     title: '复制失败',
                     icon:'',
                     image: '',
-                    duration: 50
+                    duration: 500
                 })
             }
         })

@@ -73,10 +73,6 @@ export default {
     compose:function(params, call) {
         return request('/v1/doll/compose', params, call)
     },
-    /**获取分享配置 */
-    shareConfig:function(params, call) {
-        return request('/v1/share/config', params, call)
-    },
     /**广告位 */
     ad: function(params, call) {
         return request('/v1/advert/index', params, call)
@@ -101,7 +97,8 @@ export default {
 
 function request(url, data, call){
     wx.showLoading({
-        title: '加载中'
+        title: '加载中',
+        mask: true
     })
     let obj = {};
     data.app_id = 'wx1ba02068bfd5c994'
@@ -120,6 +117,18 @@ function request(url, data, call){
         success: function(res){
             wx.hideLoading();
             call(res.data)
+        },
+        fail: function() {
+            wx.showModal({
+                title: '',
+                content: "加载失败",
+                showCancel: false,
+                cancelText:'',
+                confirmText: '确定',
+                success: function() {
+                    wx.hideLoading();
+                }
+            })
         }
     })
 }
