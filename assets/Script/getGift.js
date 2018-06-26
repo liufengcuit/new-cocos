@@ -1,6 +1,7 @@
 let http = require('http')
 cc.Class({
     extends: cc.Component,
+    
     onLoad() {
         this.backHome();
         this.prevPage();
@@ -9,6 +10,10 @@ cc.Class({
         /**隐藏按钮 */
 
         this.loadLottery();
+
+        /**页码 */
+        this.pageIndex = 0;
+        this.pageList = [];
     },
     /**加载公仔 */
     loadLottery() {
@@ -29,46 +34,29 @@ cc.Class({
                 a[j] = b;
                 i++;
             });
-
-            this.pageIndex = 0;
             this.pageList = a;
+            console.log(this.pageList)
             if(len != 0){
                 self.node.getChildByName('empty').active = false;
                 list.active = true;
-                for(let k=0, l = this.pageList[this.pageIndex].length;k <l; k++){
-                    (function(data) {
-                        cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
-                            let newNode = cc.instantiate(pre);
-                            newNode.toysId = data.doll_id;
-                            newNode.getChildByName('listId').getComponent(cc.Label).string = data.doll_id;
-                            cc.loader.loadRes(data.img, cc.SpriteFrame, function (err, spriteFrame) {
-                                if(spriteFrame){
-                                    newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = spriteFrame;
-                                    list.addChild(newNode);
-                                }
-                            })
-                        })
-                    })(this.pageList[this.pageIndex][k])
-                }
-            }else{
-                console.log('空空如也')
+                this.loadGiftList()
             }
         })
     },
-    
     /**返回主场景 */
     backHome() {
         this.node.getChildByName('home').on(cc.Node.EventType.TOUCH_START, function(event){
             //销毁当前节点
             this.node.parent = null;
             this.node.destroy();
+            cc.director.loadScene('Home')
         }, this)
     },
     /**上一页 */
     prevPage() {
         let self = this;
         this.node.getChildByName('prev').on(cc.Node.EventType.TOUCH_START, function(event){
-            if(this.pageIndex==0 || this.pageIndex == void 0){
+            if(this.pageIndex==0){
                 wx.showToast({
                     title: '已经是第一页了',
                     icon:'',
@@ -77,21 +65,9 @@ cc.Class({
                 })
             }else{
                 this.pageIndex--;
-                for(let i=0,len = this.pageList[this.pageIndex].length;i <len; i++){
-                    (function(data) {
-                        cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
-                            let newNode = cc.instantiate(pre);
-                            newNode.toysId = data.doll_id;
-                            newNode.getChildByName('listId').getComponent(cc.Label).string = data.doll_id;
-                            cc.loader.loadRes(data.img, cc.SpriteFrame, function (err, spriteFrame) {
-                                if(spriteFrame){
-                                    newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = spriteFrame;
-                                    list.addChild(newNode);
-                                }
-                            })
-                        })
-                    })(this.pageList[this.pageIndex][i])
-                }
+                console.log(this.node.getChildByName('list'))
+                this.node.getChildByName('list').destroyAllChildren();
+                this.loadGiftList();
             }
         }, this)
     },
@@ -99,7 +75,9 @@ cc.Class({
     nextPage() {
         let self = this;
         this.node.getChildByName('next').on(cc.Node.EventType.TOUCH_START, function(event){
-            if(this.pageIndex>= this.pageList.length || this.pageIndex == void 0){
+            console.log(this.pageList.length)
+            console.log(this.pageIndex)
+            if(this.pageIndex>= this.pageList.length -1){
                 wx.showToast({
                     title: '没有了',
                     icon:'',
@@ -107,24 +85,31 @@ cc.Class({
                     duration: 500
                 })
             }else{
-                console.log('下一页')
                 this.pageIndex++;
-                for(let i=0,len = this.pageList[this.pageIndex].length;i <len; i++){
-                    (function(data) {
-                        cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
-                            let newNode = cc.instantiate(pre);
-                            newNode.toysId = data.doll_id;
-                            newNode.getChildByName('listId').getComponent(cc.Label).string = data.doll_id;
-                            cc.loader.loadRes(data.img, cc.SpriteFrame, function (err, spriteFrame) {
-                                if(spriteFrame){
-                                    newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = spriteFrame;
-                                    list.addChild(newNode);
-                                }
-                            })
-                        })
-                    })(this.pageList[this.pageIndex][i])
-                }
+                console.log(this.node.getChildByName('list'))
+                this.node.getChildByName('list').destroyAllChildren();
+                this.loadGiftList()
             }
         }, this)
+    },
+    loadGiftList() {
+        console.log(this.pageList);
+        let self = this;
+        for(let i=0,len = this.pageList[this.pageIndex].length;i <len; i++){
+            (function(data) {
+                cc.loader.loadRes("prefab/giftList", cc.Prefab, function (err, pre) {
+                    let newNode = cc.instantiate(pre);
+                    newNode.toysId = data.order;
+                    newNode.getChildByName('listId').getComponent(cc.Label).string = data.order;
+                    cc.loader.load(data.img, function (err, texture) {
+                        if(texture){
+                            let frame = new cc.SpriteFrame(texture);
+                            newNode.getChildByName("image").getComponent(cc.Sprite).spriteFrame = frame;
+                            self.node.getChildByName('list').addChild(newNode);
+                        }
+                    })
+                })
+            })(this.pageList[this.pageIndex][i])
+        }
     }
 });
