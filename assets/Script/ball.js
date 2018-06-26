@@ -171,12 +171,10 @@ cc.Class({
         if(this.game.directionMove){
             this.game.moveDisappear(this.game.basketRight, function() {
                 this.game.moveAppear(this.game.basketLeft);
-                this.game.recoverBasketEffect()
             }.bind(this));
         }else{
             this.game.moveDisappear(this.game.basketLeft, function() {
                 this.game.moveAppear(this.game.basketRight);
-                this.game.recoverBasketEffect()
             }.bind(this));
         }
         

@@ -175,27 +175,33 @@ cc.Class({
     },
     /**篮筐特效 */
     basketEffect() {
-        let color = new cc.Color(0,0,0,255)
-        this.setBasketColor(color);
+        // let color = new cc.Color(0,0,0,255)
+        this.setBasketColor();
         this.directionMove ? 
             this.basketRight.getChildByName('explosion').getComponent(cc.Animation).play("explosion"):
             this.basketLeft.getChildByName('explosion').getComponent(cc.Animation).play("explosion");
     },
     /**恢复篮筐样式 */
     recoverBasketEffect() {
-        let color = new cc.Color(255,255,255,255)
-        this.setBasketColor(color);
+        // let color = new cc.Color(255,255,255,255)
+        // this.setBasketColor();
     },
     /**设置篮筐颜色 */
     setBasketColor(color) {
         if(this.directionMove){
-            this.basketRight.getChildByName('back').color = color;
-            this.basketRight.getChildByName('front').color = color;
-            this.node.getChildByName('effect').color = color;
+            // this.basketRight.getChildByName('back').color = color;
+            // this.basketRight.getChildByName('front').color = color;
+            // this.node.getChildByName('effect').color = color;
+            this.basketRight.getChildByName('back').getComponent(cc.Animation).play("black");
+            this.basketRight.getChildByName('front').getComponent(cc.Animation).play("black");
+            this.node.getChildByName('effect').getComponent(cc.Animation).play("black");
         }else{
-            this.basketLeft.getChildByName('back').color = color;
-            this.basketLeft.getChildByName('front').color = color;
-            this.node.getChildByName('effect-copy').color = color;
+            // this.basketLeft.getChildByName('back').color = color;
+            // this.basketLeft.getChildByName('front').color = color;
+            // this.node.getChildByName('effect-copy').color = color;
+            this.basketLeft.getChildByName('back').getComponent(cc.Animation).play("black");
+            this.basketLeft.getChildByName('front').getComponent(cc.Animation).play("black");
+            this.node.getChildByName('effect-copy').getComponent(cc.Animation).play("black");
         }
     },
     /**判断进度条是否已经加载完成 */
