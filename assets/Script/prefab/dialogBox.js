@@ -35,7 +35,7 @@ cc.Class({
     invite() {
         this.node.getChildByName('buttom_Invite ').on(cc.Node.EventType.TOUCH_START, function(event) {
             http.share({
-                openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
+                openid: wx.getStorageSync('openid'),
                 type: 3
             }, result => {
                 if(result.data){

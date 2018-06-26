@@ -26,7 +26,7 @@ cc.Class({
             else{
                 challenge.getChildByName('goal').getComponent(cc.Label).string = '挑战目标：'+(window.goalScore)
                 http.isCanLottery({
-                    openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                    openid: wx.getStorageSync('openid')
                 }, result => {
                     /**能继续抽奖 */
                     if(result.data){
@@ -71,7 +71,7 @@ cc.Class({
                 cc.director.loadScene('Game');
             }else{
                 http.challengeCheck({
-                    openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                    openid: wx.getStorageSync('openid')
                 }, result => {
                     if(result.data.result){
                         cc.director.loadScene('Game');
@@ -177,7 +177,7 @@ cc.Class({
     loadZhuanPan() {
         let self = this;
         let resultConfig = ['系统异常','挑战成功', '挑战成功不摇奖', '挑战失败', '进入挑战模式', '普通模式正常结束']
-        http.point({openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',point: window.lastScore, mode: window.gameMode}, res => {
+        http.point({openid: wx.getStorageSync('openid'),point: window.lastScore, mode: window.gameMode}, res => {
             console.log(res)
             
             if(window.gameMode == 2){

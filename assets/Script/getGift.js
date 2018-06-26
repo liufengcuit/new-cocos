@@ -20,7 +20,7 @@ cc.Class({
         let self = this;
         let list = this.node.getChildByName('list');
         http.user({
-            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+            openid: wx.getStorageSync('openid')
         }, result => {
             let len = result.data.length;
             let a = [], b=[],i=0, j=0;

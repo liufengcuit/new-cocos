@@ -52,8 +52,25 @@ cc.Class({
                         console.log(res)
                     })
                 }else{
-                    self.reActiveNode()
-                    self.baseInfo();
+                    if(wx.getStorageSync('openid')){
+                        self.reActiveNode()
+                        self.baseInfo();
+                    }else{
+                        wx.login({
+                            success: function (res) {
+                                console.log(res)
+                                http.session({
+                                    openid:'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
+                                    wxCode: res.code
+                                }, function(result){
+                                    wx.setStorageSync('openid', "o7Ocn47Jx_OO0UX0taxAEND4IZGE")
+                                    self.reActiveNode()
+                                    self.baseInfo();
+                                })
+                            }
+                        })
+                    }
+                    
                 }
             }
         })
@@ -79,7 +96,7 @@ cc.Class({
     /**获取用户信息，并坚持是否开启了挑战模式 */
     baseInfo() {
         http.info({
-            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+            openid: wx.getStorageSync('openid')
         }, result=> {
             this.node.getChildByName('open').active = false;
             if(result.data.is_start_challenge){
@@ -124,7 +141,7 @@ cc.Class({
     startChallengeGame() {
         this.node.getChildByName('buttons').getChildByName('challenge').on(cc.Node.EventType.TOUCH_START, function(event){
             http.ticketCheck({
-                openid: "o7Ocn47Jx_OO0UX0taxAEND4IZGE"
+                openid: wx.getStorageSync('openid')
             }, result => {
                 if(result.data.result){
                     window.gameMode = 1;
@@ -155,7 +172,7 @@ cc.Class({
     /**检查今天是否还能继续挑战 */
     isNextChallenge() {
         http.challengeCheck({
-            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+            openid: wx.getStorageSync('openid')
         }, result => {
             if(result.data.result){
                 console.log('继续游戏')
@@ -271,7 +288,7 @@ cc.Class({
     /**检查是否有新的入场券或者复活卡 */
     checkNewTips() {
         http.showNew({
-            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+            openid: wx.getStorageSync('openid')
         }, result => {
             if(result.data.ticket){
                 cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {

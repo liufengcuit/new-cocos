@@ -45,7 +45,7 @@ window._wx = {
                             iv: params.iv
                         }, function(result){
                             console.log(result)
-                            // wx.setStorageSync('ball_openid', result.data.openid)
+                            wx.setStorageSync('openid', result.data.openid)
                             call(result.data.life_card)
                         })
                         

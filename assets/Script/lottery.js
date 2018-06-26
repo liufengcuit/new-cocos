@@ -131,7 +131,7 @@ cc.Class({
         let startBtn = this.node.getChildByName('game_box').getChildByName('start')
         let resultConfig = ['系统错误', '成功', '次数超限', '没有挑战记录', '挑战和摇奖不是同一个用户', '挑战没有成功', '重摇次数超限']
         http.lottery({
-            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
+            openid: wx.getStorageSync('openid'),
             log_id: window.log_id
         }, result => {
             if(result.data.result == 1){

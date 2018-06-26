@@ -34,7 +34,7 @@ cc.Class({
                     if(confirm.confirm){
                         //销毁当前节点
                         http.compose({
-                            openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE'
+                            openid: wx.getStorageSync('openid')
                         }, result => {
                             wx.showModal({
                                 title: '',
