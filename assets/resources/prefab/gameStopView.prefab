@@ -32,18 +32,21 @@
     "_components": [
       {
         "__id__": 25
+      },
+      {
+        "__id__": 26
       }
     ],
     "_prefab": {
-      "__id__": 26
+      "__id__": 27
     },
     "_id": "",
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 0,
+      "g": 0,
+      "b": 0,
       "a": 255
     },
     "_cascadeOpacityEnabled": true,
@@ -758,6 +761,27 @@
     },
     "fileId": "36RJkyvLZMt5FCymHn+0fA",
     "sync": false
+  },
+  {
+    "__type__": "d3f4bg/ybxGYpEQRhkzFQTB",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "back_Game": {
+      "__id__": 11
+    },
+    "restart_Game": {
+      "__id__": 19
+    },
+    "life_Card": {
+      "__id__": 16
+    },
+    "back_Home": {
+      "__id__": 7
+    }
   },
   {
     "__type__": "2b396P8uQpPhqUkOJU72gZf",

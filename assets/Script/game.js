@@ -12,6 +12,7 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        console.log('onload')
         /**判断是否需要加载3,2,1倒计时 */
         this.isLoading();
         /**开启物理组件碰撞系统 */
@@ -45,6 +46,7 @@ cc.Class({
         wx.showShareMenu({
             withShareTicket: true
         })
+        
     },
     isLoading() {
         let self = this;
@@ -78,8 +80,8 @@ cc.Class({
             let audio = wx.createInnerAudioContext();
             audio.src = "res/raw-assets/resources/audio/start-whistling.mp3"
             audio.play();
-            
         }
+        this.pauseGame();
     },
 
     init: function() {
@@ -187,7 +189,6 @@ cc.Class({
     /**进入下一个场景 */
     nextPage() {
         window.timeOut = setTimeout(()=> {
-            window.lastScore = this.score;
             cc.director.loadScene('gameOver');
         }, 1000);
     },
@@ -242,11 +243,53 @@ cc.Class({
     },
     /**是否使用复活卡 */
     isUseLifeCard() {
+        let self = this;
+        window.lastScore = this.score;
         this.isNext = false;
         if(window.life_card && window.life_card > 0){
-            
+            this.node.on('say-hello', function (event) {
+                self.isClick = true;
+                self.node.parent.getChildByName('timebar').getChildByName('timebar').getComponent(cc.ProgressBar).progress = 1;
+                self.node.getChildByName('basketball').position={x:0,y: 206}
+                self.conlisonNum = 0;
+                self.isNext = true;
+              });
+            cc.loader.loadRes("prefab/gamefahuoView", cc.Prefab, function (err, pre) {
+                let newNode = cc.instantiate(pre);
+                newNode.width = window.game_width;
+                newNode.height = window.game_height;
+                newNode.zIndex = 60;
+                newNode.position={
+                    x: 0,
+                    y: 0
+                }
+                self.node.addChild(newNode)
+            })
         }else{
             this.nextPage();
         }
+    },
+    /**暂停游戏 */
+    pauseGame() {
+        // let self = this;
+        // this.node.parent.getChildByName('pause').on(cc.Node.EventType.TOUCH_START, function(event) {
+        //     this.node.on('resume', function(event) {
+        //         console.log('吃')
+        //         cc.director.resume();
+        //     });
+        //     cc.loader.loadRes("prefab/gameStopView", cc.Prefab, function (err, pre) {
+        //         let newNode = cc.instantiate(pre);
+        //         newNode.width = window.game_width;
+        //         newNode.height = window.game_height;
+        //         newNode.zIndex = 60;
+        //         newNode.position={
+        //             x: 0,
+        //             y: 0
+        //         }
+        //         self.node.addChild(newNode)
+        //         cc.director.pause();
+        //     })
+        //     event.stopPropagation();
+        // }, this)
     }
 });
