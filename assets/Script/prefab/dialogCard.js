@@ -7,6 +7,9 @@ cc.Class({
     onLoad () {
         this.closePrefab();
         this.invite();
+        wx.showShareMenu({
+            withShareTicket: true
+        })
     },
     /**关闭prefab */
     closePrefab() {
@@ -25,7 +28,7 @@ cc.Class({
                     wx.shareAppMessage({
                         title: window.shareConfigs[3].content,
                         imageUrl: window.shareConfigs[3].img,
-                        query: `?click_id=${result.data}&type=2`
+                        query: `click_id=${result.data}&type=2`
                     })
                 }else{
                     wx.showModal({

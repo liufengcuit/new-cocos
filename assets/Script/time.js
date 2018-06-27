@@ -17,6 +17,9 @@ cc.Class({
         window.timer = setInterval(function() {
             bar.progress = bar.progress.toFixed(4) - 1/(this.time*20)
             if(bar.progress <= 0){
+                let audio = wx.createInnerAudioContext();
+                audio.src = 'res/raw-assets/resources/audio/over-voice.mp3'
+                audio.play();
                 clearInterval(window.timer)
                 call()
             }
@@ -32,7 +35,7 @@ cc.Class({
             return -1
         }else if(level >= 2 && level <= 5){
             this.isScaleStart = 0.3;
-            return 3;
+            return 11;
         }else if(level >= 6 && level <= 10){
             this.isScaleStart = 0.3;
             return 10

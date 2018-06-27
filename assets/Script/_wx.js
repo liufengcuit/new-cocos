@@ -1,16 +1,4 @@
 let http = require('http')
-const audioCollect = [
-        /**背景 */
-        'audio_background',
-        /**点击屏幕 */
-        'clickball',
-        /**进球 */
-        '',
-        /**喝彩 */,
-        '',
-        /**时间到 */
-        ''
-    ]
 
 window._wx = {
     //播放音乐
@@ -54,7 +42,6 @@ window._wx = {
             }
         })
     },
-
     //session
     checkSession() {
         wx.checkSession({

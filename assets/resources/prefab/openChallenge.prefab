@@ -35,10 +35,13 @@
     "_components": [
       {
         "__id__": 22
+      },
+      {
+        "__id__": 23
       }
     ],
     "_prefab": {
-      "__id__": 23
+      "__id__": 24
     },
     "_id": "",
     "_opacity": 255,
@@ -658,6 +661,15 @@
     },
     "fileId": "6c8FOm6ohEzLPk4bwlyLxN",
     "sync": false
+  },
+  {
+    "__type__": "094d6G0e39MdId3raTcb1VY",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true
   },
   {
     "__type__": "cc.BlockInputEvents",

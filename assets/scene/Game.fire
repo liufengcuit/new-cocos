@@ -2417,7 +2417,7 @@
       "__id__": 69
     },
     "_enabled": true,
-    "tag": 0,
+    "tag": 4000,
     "_density": 1,
     "_sensor": false,
     "_friction": 0.2,

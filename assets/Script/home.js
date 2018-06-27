@@ -13,12 +13,13 @@ cc.Class({
         window.game_height = visibleSize.height;
         window.game_width = visibleSize.width;
         let self = this;
+        this.isChallenge = false;
 
         /**隐藏按钮 */
         this.node.getChildByName('buttons').active = false;
         this.node.getChildByName('un_open').active = false;
         /**加载广告位 */
-        this.node.getChildByName('moregame').active = false;
+        // this.node.getChildByName('moregame').active = false;
         this.ad();
 
         wx.getSetting({
@@ -45,16 +46,17 @@ cc.Class({
                                 self.reActiveNode()
                                 button.destroy();
                                 self.baseInfo();
+                                self.checkNewTips();
                             })
                         }else{
                             return false;
                         }
-                        console.log(res)
                     })
                 }else{
                     if(wx.getStorageSync('openid')){
                         self.reActiveNode()
                         self.baseInfo();
+                        self.checkNewTips();
                     }else{
                         wx.login({
                             success: function (res) {
@@ -64,6 +66,7 @@ cc.Class({
                                     wxCode: res.code
                                 }, function(result){
                                     wx.setStorageSync('openid', "o7Ocn47Jx_OO0UX0taxAEND4IZGE")
+                                    self.checkNewTips();
                                     self.reActiveNode()
                                     self.baseInfo();
                                 })
@@ -80,6 +83,9 @@ cc.Class({
         wx.showShareMenu({
             withShareTicket: true
         })
+
+        this.wxConfig();
+        this.playBgMusic();
     },
 
     /*加载我的公仔页面 */
@@ -93,15 +99,17 @@ cc.Class({
             });
         }, this)
     },
-    /**获取用户信息，并坚持是否开启了挑战模式 */
+    /**获取用户信息，并检查是否开启了挑战模式 */
     baseInfo() {
         http.info({
             openid: wx.getStorageSync('openid')
         }, result=> {
             this.node.getChildByName('open').active = false;
+            this.config();
             if(result.data.is_start_challenge){
                 let self = this;
                 let buttons = this.node.getChildByName('un_open').getChildByName('buttons');
+                this.isChallenge = true;
                 cc.loader.loadRes("challenge2.png", cc.SpriteFrame, function (err, spriteFrame) {
                     self.node.getChildByName('buttons').getChildByName('challenge').getComponent(cc.Sprite).spriteFrame = spriteFrame;
                     buttons.active = true;
@@ -114,20 +122,24 @@ cc.Class({
                     buttons.getChildByName('card').getChildByName('recard').getComponent(cc.Label).string = '复活卡x'+result.data.life_card;
                 });
 
-                this.config();
+                
                 this.ticket();
                 this.lifeCard();
                 this.explain();
-                this.startChallengeGame();
             }else{
-                wx.showModal({
-                    title: '',
-                    content: '暂时未开通',
-                    showCancel: false,
-                    cancelText:'',
-                    confirmText: '确定'
-                })
+                this.isChallenge = false;
+                this.node.getChildByName('open').active = true;
+                this.node.getChildByName('open').opacity = 255;
+                this.node.getChildByName('un_open').opacity = 0;
+                // wx.showModal({
+                //     title: '',
+                //     content: '暂时未开通',
+                //     showCancel: false,
+                //     cancelText:'',
+                //     confirmText: '确定'
+                // })
             }
+            this.startChallengeGame();
         })
     },
     /**开始普通游戏模式 */
@@ -140,23 +152,35 @@ cc.Class({
     /**开始挑战游戏模式 */
     startChallengeGame() {
         this.node.getChildByName('buttons').getChildByName('challenge').on(cc.Node.EventType.TOUCH_START, function(event){
-            http.ticketCheck({
-                openid: wx.getStorageSync('openid')
-            }, result => {
-                if(result.data.result){
-                    window.gameMode = 1;
-                    window.use_lifeCard_num = result.data.use_num;
-                    cc.director.loadScene('Game')
-                }else{
-                    wx.showModal({
-                        title: '',
-                        content: '入场券不够了',
-                        showCancel: false,
-                        cancelText:'',
-                        confirmText: '确定'
-                    })
-                }
-            })
+            if(this.isChallenge){
+                http.ticketCheck({
+                    openid: wx.getStorageSync('openid')
+                }, result => {
+                    if(result.data.result){
+                        window.gameMode = 1;
+                        window.use_lifeCard_num = result.data.use_num;
+                        cc.director.loadScene('Game')
+                    }else{
+                        wx.showModal({
+                            title: '',
+                            content: '入场券不够了',
+                            showCancel: false,
+                            cancelText:'',
+                            confirmText: '确定'
+                        })
+                    }
+                })
+            }else{
+                wx.showModal({
+                    title: '',
+                    content: `游戏中达到${window.challenge_start_point?window.challenge_start_point:200}分后即可开启挑战模式`,
+                    showCancel: false,
+                    cancelText:'',
+                    confirmText: '确定'
+                })
+                console.log('ewrwr')
+            }
+            
             
         }, this)
     },
@@ -165,6 +189,7 @@ cc.Class({
         http.config({}, result=> {
             if(result.data){
                 window.goalScore = result.data.challenge_point;
+                window.challenge_start_point = result.data.challenge_start_point
                 this.node.getChildByName('un_open').getChildByName('score').getComponent(cc.Label).string = result.data.challenge_point;
             }
         })
@@ -196,14 +221,15 @@ cc.Class({
             if(!result.data){
                 return false;
             }
-            this.node.getChildByName('moregame').active = true
+            self.node.getChildByName('moregame').active = true
             self.previewAdCode = result.data;
-            /**获取成功过后才绑定广告预览事件 */
-            self.previewAd();
-            cc.loader.load(result.data.ad_img, function (err, texture) {
-                if(texture){
-                    let frame = new cc.SpriteFrame(texture);
-                    self.node.getChildByName('moregame').getComponent(cc.Sprite).spriteFrame = frame; 
+            console.log(result.data.ad_img)
+            cc.loader.load(result.data.ad_img, function (err, text) {
+                if(text){
+                    let frame = new cc.SpriteFrame(text);
+                    self.node.getChildByName('moregame').getComponent(cc.Sprite).spriteFrame = frame;
+                    /**获取成功过后才绑定广告预览事件 */
+                    self.previewAd();
                 }
             })
         })
@@ -272,24 +298,18 @@ cc.Class({
             }) 
         })
     },
-    /**挑战模式已开启事件 */
-    openChallenge() {
-        cc.loader.loadRes("prefab/openChallenge", cc.Prefab, function (err, pre) {
-            let newNode = cc.instantiate(pre);
-            newNode.width = window.game_width;
-            newNode.height = window.game_height;
-            newNode.position={
-                x: window.game_width/2,
-                y: window.game_height/2
-            }
-            cc.director.getScene().addChild(newNode);
-        }) 
-    },
     /**检查是否有新的入场券或者复活卡 */
     checkNewTips() {
+        if(!wx.getStorageSync('openid')){
+            return false;
+        }
         http.showNew({
             openid: wx.getStorageSync('openid')
         }, result => {
+            console.log(result)
+            if(!result.data){
+                return false;
+            }
             if(result.data.ticket){
                 cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {
                     let newNode = cc.instantiate(pre);
@@ -358,14 +378,45 @@ cc.Class({
             }
         })
     },
-    /**分享请求，获取clickID */
-    shareClickId() {
-        // http.share({
-        //     openid: 'o7Ocn47Jx_OO0UX0taxAEND4IZGE',
-        //     type:
-        // })
+    wxConfig() {
+        let self = this;
+        wx.onShow(function(res) {
+            if(res.query){
+                // 复活卡
+                if(res.query.type == 2){
+                    http.inviteBack({
+                        click_id: res.query.clickId,
+                        openid: wx.getStorageSync('openid')
+                    }, result=>{})
+                }
+                if(res.query.type == 3){
+                    http.inviteTicket({
+                        click_id: res.query.clickId,
+                        openid: wx.getStorageSync('openid')
+                    }, result=>{})
+                }
+                console.log(res.query)
+                console.log(res)
+            }
+            console.log(res)
+            self.checkNewTips();
+        })
     },
-    start () {
+    playBgMusic() {
+        this.audio = wx.createInnerAudioContext();
+        this.audio.src = "res/raw-assets/resources/audio/bg.mp3"
 
+        this.audio.loop = true;
+        wx.onShow(function () {
+            this.audio.play()
+            // this.checkNewTips();
+        }.bind(this))
+        wx.onHide(function() {
+            this.audio.pause();
+        }.bind(this))
+        this.audio.play()
+    },
+    onDestroy() {
+        this.audio.stop();
     }
 });

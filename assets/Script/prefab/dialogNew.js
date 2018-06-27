@@ -1,32 +1,15 @@
-let http = require('http')
 cc.Class({
     extends: cc.Component,
 
     properties: {
     },
+
     onLoad () {
         this.closePrefab();
         this.invite();
         wx.showShareMenu({
             withShareTicket: true
         })
-    },
-    /**配置 */
-    config() {
-        let ticketNum;
-        let node = this.node.getChildByName('ticket_big');
-        if(window.ticket ==0 || window.ticket == void 0){
-            ticketNum = 0;
-            cc.loader.loadRes('Popup_no_ticket_.png', cc.SpriteFrame, function (err, spriteFrame) {
-                node.getChildByName('ticket_num').getComponent(cc.Sprite).spriteFrame = spriteFrame;
-            })
-        }else{
-            ticketNum = window.ticket;
-            cc.loader.loadRes('Popup_ticket_name.png', cc.SpriteFrame, function (err, spriteFrame) {
-                node.getChildByName('ticket_num').getComponent(cc.Sprite).spriteFrame = spriteFrame;
-            })
-        }
-        node.getChildByName('ticket_num').getComponent(cc.Label).string = ticketNum;
     },
     /**关闭prefab */
     closePrefab() {
@@ -36,7 +19,7 @@ cc.Class({
     },
     /**邀请好友 */
     invite() {
-        this.node.getChildByName('buttom_Invite ').on(cc.Node.EventType.TOUCH_START, function(event) {
+        this.node.getChildByName('invite').on(cc.Node.EventType.TOUCH_START, function(event) {
             http.share({
                 openid: wx.getStorageSync('openid'),
                 type: 3
@@ -45,7 +28,7 @@ cc.Class({
                     wx.shareAppMessage({
                         title: window.shareConfigs[3].content,
                         imageUrl: window.shareConfigs[3].img,
-                        query: `click_id=${result.data}&type=3`
+                        query: `click_id=${result.data}&type=2`
                     })
                 }else{
                     wx.showModal({

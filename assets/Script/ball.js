@@ -1,4 +1,7 @@
 let Progress = require('time')
+let simpleAudio = 'res/raw-assets/resources/audio/simple-shot.mp3';
+let bounce = 'res/raw-assets/resources/audio/bounce.mp3';
+let audioBall = ['res/raw-assets/resources/audio/perfect.mp3', 'res/raw-assets/resources/audio/great-shot.mp3','res/raw-assets/resources/audio/nice-shot.mp3', 'res/raw-assets/resources/audio/nice-move.mp3']
 cc.Class({
     extends: cc.Component,
 
@@ -56,8 +59,17 @@ cc.Class({
         if(otherCollider.tag === 1003){
             this._initPos = true;
         }
+        //碰到地板
+        if(otherCollider.tag === 4000){
+            if(this.game.isProgressEnd() <=0){
+                this.game.conlisonNum++;
+            }
+        }
         //碰到篮板
         if(otherCollider.tag === 1000){
+            let audio = wx.createInnerAudioContext();
+            audio.src = bounce
+            audio.play();
             this.ballOne = true
         }
         //碰到篮圈
@@ -125,6 +137,9 @@ cc.Class({
                 //普通球，普通加分效果
                 console.log('普通球')
                 this.game.effectIndex = 0;
+                let audio = wx.createInnerAudioContext();
+                audio.src = simpleAudio
+                audio.play();
             break;
             case 1:
                 //空心球specialball03.png
@@ -132,6 +147,9 @@ cc.Class({
                     sp.spriteFrame = spriteFrame;
                     self.ballInAnim(node);
                     self.ballTypeNum = 0;
+                    let audio = wx.createInnerAudioContext();
+                    audio.src = audioBall[Math.floor(Math.random() *4)]
+                    audio.play();
                 });
                 this.game.effectIndex++;
             break;
@@ -141,6 +159,9 @@ cc.Class({
                     sp.spriteFrame = spriteFrame;
                     self.ballInAnim(node);
                     self.ballTypeNum = 0;
+                    let audio = wx.createInnerAudioContext();
+                    audio.src = audioBall[Math.floor(Math.random() *4)]
+                    audio.play();
                 });
                 this.game.effectIndex++;
             break;
@@ -150,6 +171,9 @@ cc.Class({
                     sp.spriteFrame = spriteFrame;
                     self.ballInAnim(node);
                     self.ballTypeNum = 0;
+                    let audio = wx.createInnerAudioContext();
+                    audio.src = audioBall[Math.floor(Math.random() *4)]
+                    audio.play();
                 });
                 this.game.effectIndex++;
             break;
@@ -159,6 +183,9 @@ cc.Class({
                     sp.spriteFrame = spriteFrame;
                     self.ballInAnim(node);
                     self.ballTypeNum = 0;
+                    let audio = wx.createInnerAudioContext();
+                    audio.src = audioBall[Math.floor(Math.random() *4)]
+                    audio.play();
                 });
                 clearTimeout(window.timeOut);
                 this.game.effectIndex++;
@@ -171,10 +198,12 @@ cc.Class({
         if(this.game.directionMove){
             this.game.moveDisappear(this.game.basketRight, function() {
                 this.game.moveAppear(this.game.basketLeft);
+                this.game.recoverBasketEffect();
             }.bind(this));
         }else{
             this.game.moveDisappear(this.game.basketLeft, function() {
                 this.game.moveAppear(this.game.basketRight);
+                this.game.recoverBasketEffect();
             }.bind(this));
         }
         

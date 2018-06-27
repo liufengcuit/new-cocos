@@ -5,8 +5,6 @@ cc.Class({
     properties: {
     },
 
-    // LIFE-CYCLE CALLBACKS:
-
     onLoad () {
         /**为普通模式时候 */
         let challenge = this.node.getChildByName('challenge');
@@ -34,6 +32,7 @@ cc.Class({
                         challenge.getChildByName('chose_toy_button').opacity = 255;
                         this.node.getChildByName('btns').active = false;
                         this.node.getChildByName('btns').opacity = 0;
+                        this.extractGift();
                     }else{
                         /**不能参与摇奖 */
                         challenge.getChildByName('title').opacity = 0;
@@ -50,13 +49,14 @@ cc.Class({
         this.againChallenge();
         this.invite();
         this.reliveCard();
-        this.extractGift();
-
-
         this.loadZhuanPan();
         wx.showShareMenu({
             withShareTicket: true
         })
+
+        this.defaultShare();
+        this.wxConfig();
+        this.checkNewTips();
     },
     /**回到首页 */
     backHome() {
@@ -93,33 +93,28 @@ cc.Class({
     invite() {
         this.node.getChildByName('btns').getChildByName('button03').on(cc.Node.EventType.TOUCH_START, function(event){
             wx.shareAppMessage({
-                title: '邀请好友',
-                imageUrl: '',
-                query: '',
-                success: function() {
-                    console.log('sdfsf')
-                }
+                title: window.shareConfigs[1].content,
+                imageUrl: window.shareConfigs[1].img
             })
         })
     },
     /**复活卡 */
     reliveCard() {
         this.node.getChildByName('btns').getChildByName('card_relive').on(cc.Node.EventType.TOUCH_START, function(event){
-            console.log('复活卡')
+            cc.loader.loadRes("prefab/lifeCard", cc.Prefab, function (err, pre) {
+                let newNode = cc.instantiate(pre);
+                newNode.width = window.game_width;
+                newNode.height = window.game_height;
+                newNode.position={
+                    x: window.game_width/2,
+                    y: window.game_height/2
+                }
+                cc.director.getScene().addChild(newNode);
+            })
         })
     },
     /**抽取公仔 */
     extractGift() {
-        // cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
-        //     var newNode = cc.instantiate(pre);
-        //     newNode.width = window.game_width;
-        //     newNode.height = window.game_height;
-        //     newNode.position={
-        //         x: window.game_width/2,
-        //         y: window.game_height/2
-        //     }
-        //     cc.director.getScene().addChild(newNode);
-        // })
         this.node.getChildByName('challenge').getChildByName('chose_toy_button').on(cc.Node.EventType.TOUCH_START, function(event){
             console.log('抽取公仔')
             cc.loader.loadRes("prefab/lottery", cc.Prefab, function (err, pre) {
@@ -182,12 +177,17 @@ cc.Class({
             
             if(window.gameMode == 2){
                 self.node.getChildByName('challenge').getChildByName('goal').opacity = 255;
-                self.node.getChildByName('challenge').getChildByName('goal').getComponent(cc.Label).string = '本周最佳：'+res.data.weekbest
+                self.node.getChildByName('challenge').getChildByName('goal').getComponent(cc.Label).string = '本周最佳：'+(res.data.weekbest?res.data.weekbest:0)
             }else if(res.data.result == 1){
                 window.lotteryImg = res.data.lottery_config.options;
                 window.log_id = res.data.lottery_config.log_id;
                 window.reelect_time = res.data.lottery_config.reelect_time
-            }else if(res.data.result == 4){
+            }else{
+                console.log('挑战失败')
+            }
+
+            if(res.data.result == 4){
+                /**进入挑战模式 */
                 cc.loader.loadRes("prefab/openChallenge", cc.Prefab, function (err, pre) {
                     let newNode = cc.instantiate(pre);
                     newNode.width = window.game_width;
@@ -196,9 +196,86 @@ cc.Class({
                         x: window.game_width/2,
                         y: window.game_height/2
                     }
+                    cc.director.getScene().addChild(newNode);
                 })
-            }else{
-                console.log('挑战失败')
+            }
+        })
+    },
+    /**默认分享弹窗 */
+    defaultShare() {
+        wx.onShareAppMessage(() =>{
+            return {
+                title: window.shareConfigs[1].content,
+                imageUrl: window.shareConfigs[1].img
+            }
+        })
+    },
+    wxConfig() {
+        let self = this;
+        wx.onShow(function(res) {
+            if(res.query){
+                // 复活卡
+                if(res.query.type == 2){
+                    http.inviteBack({
+                        click_id: res.query.clickId,
+                        openid: wx.getStorageSync('openid')
+                    }, result=>{})
+                }
+                if(res.query.type == 3){
+                    http.inviteTicket({
+                        click_id: res.query.clickId,
+                        openid: wx.getStorageSync('openid')
+                    }, result=>{})
+                }
+            }
+        })
+    },
+    /**检查是否有新的入场券或者复活卡 */
+    checkNewTips() {
+        http.showNew({
+            openid: wx.getStorageSync('openid')
+        }, result => {
+            console.log(result.data)
+            if(!result.data){
+                return false;
+            }
+            if(result.data.ticket){
+                cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {
+                    let newNode = cc.instantiate(pre);
+                    newNode.width = window.game_width;
+                    newNode.height = window.game_height;
+                    newNode.position={
+                        x: window.game_width/2,
+                        y: window.game_height/2
+                    }
+                    cc.loader.load(result.data.ticket.avatar, function (err, texture) {
+                        if(texture){
+                            let frame = new cc.SpriteFrame(texture);
+                            newNode.getChildByName('headport').getComponent(cc.Sprite).spriteFrame = frame; 
+                            newNode.getChildByName('headport').getChildByName('username').getComponent(cc.Label).string = result.data.ticket.nickname;
+                            cc.director.getScene().addChild(newNode);
+                        }
+                    })
+                }) 
+            }
+            if(result.data.life_card){
+                cc.loader.loadRes("prefab/dialogNew", cc.Prefab, function (err, pre) {
+                    let newNode = cc.instantiate(pre);
+                    newNode.width = window.game_width;
+                    newNode.height = window.game_height;
+                    newNode.position={
+                        x: window.game_width/2,
+                        y: window.game_height/2
+                    }
+                    cc.loader.load(result.data.life_card.avatar, function (err, texture) {
+                        if(texture){
+                            let frame = new cc.SpriteFrame(texture);
+                            newNode.getChildByName('headport').getComponent(cc.Sprite).spriteFrame = frame; 
+                            newNode.getChildByName('headport').getChildByName('username').getComponent(cc.Label).string = result.data.life_card.nickname;
+                            cc.director.getScene().addChild(newNode);
+                        }
+                    })
+                }) 
             }
         })
     }

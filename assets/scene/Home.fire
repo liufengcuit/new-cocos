@@ -81,10 +81,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 50
+        "__id__": 49
       },
       {
-        "__id__": 51
+        "__id__": 50
       }
     ],
     "_prefab": null,
@@ -1813,13 +1813,10 @@
       },
       {
         "__id__": 48
-      },
-      {
-        "__id__": 49
       }
     ],
     "_prefab": null,
-    "_id": "1a40Ey1ttJxLuN3pRaFE27",
+    "_id": "64EJO/0zBOsLCIu0acCe9s",
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
@@ -1864,7 +1861,7 @@
     },
     "_enabled": true,
     "_spriteFrame": null,
-    "_type": 1,
+    "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
@@ -1886,7 +1883,7 @@
     "node": {
       "__id__": 45
     },
-    "_enabled": true,
+    "_enabled": false,
     "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 9,
@@ -1922,15 +1919,6 @@
       }
     ],
     "playOnLoad": true
-  },
-  {
-    "__type__": "f2805efuYxEjbRQ0KidvnPt",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 45
-    },
-    "_enabled": true
   },
   {
     "__type__": "cc.Canvas",

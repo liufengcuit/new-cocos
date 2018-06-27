@@ -21,6 +21,10 @@ cc.Class({
                 this.isClick = false;
                 return false;
             }
+            let audio = wx.createInnerAudioContext();
+            audio.src = "res/raw-assets/resources/audio/click.mp3";
+            audio.play();
+
             this.ball.initBallType();
             this.basketball = this.node.getChildByName('basketball')
             this.bodyJump = this.basketball.getComponent(cc.RigidBody);
@@ -31,13 +35,16 @@ cc.Class({
                 this.bodyJump.linearVelocity = cc.v2(-250, 1500)
             }
         }, this)
-
         this.init();
 
         /**设置篮球阴影 */
         this.shadowWidth = this.node.getChildByName('shadow').width
         this.shadowHeight = this.node.getChildByName('shadow').height
         this.y = this.node.getChildByName('shadow').y
+
+        wx.showShareMenu({
+            withShareTicket: true
+        })
     },
     isLoading() {
         let self = this;
@@ -58,11 +65,20 @@ cc.Class({
                 time--;
                 if(time == -1){
                     self.node.getChildByName('basketball').position={x:0,y: 206}
+                    self.playBgMusic();
                     ballNode.destroy();
+                    let audio = wx.createInnerAudioContext();
+                    audio.src = "res/raw-assets/resources/audio/start-whistling.mp3"
+                    audio.play();
                 }
             },1000);
         }else{
             ballNode.destroy();
+            self.playBgMusic();
+            let audio = wx.createInnerAudioContext();
+            audio.src = "res/raw-assets/resources/audio/start-whistling.mp3"
+            audio.play();
+            
         }
     },
 
@@ -84,6 +100,9 @@ cc.Class({
         /**判断按钮是否可以被点击 */
         this.isClick = true;
         this.isNext = true;
+
+        this.isFloor = false;
+        this.conlisonNum = 0;
 
     },
     //初始化篮筐位置
@@ -161,9 +180,8 @@ cc.Class({
         }
 
         /**判断是否结束当前比赛 */
-        if(!this.isClick && this.isNext){
-            this.isNext = false;
-            this.nextPage();
+        if(this.conlisonNum > 50 && this.isNext){
+            this.isUseLifeCard();
         }
     },
     /**进入下一个场景 */
@@ -175,33 +193,27 @@ cc.Class({
     },
     /**篮筐特效 */
     basketEffect() {
-        // let color = new cc.Color(0,0,0,255)
-        this.setBasketColor();
+        let color = new cc.Color(0,0,0,255)
+        this.setBasketColor(color);
         this.directionMove ? 
             this.basketRight.getChildByName('explosion').getComponent(cc.Animation).play("explosion"):
             this.basketLeft.getChildByName('explosion').getComponent(cc.Animation).play("explosion");
     },
     /**恢复篮筐样式 */
     recoverBasketEffect() {
-        // let color = new cc.Color(255,255,255,255)
-        // this.setBasketColor();
+        let color = new cc.Color(255,255,255,255)
+        this.setBasketColor(color);
     },
     /**设置篮筐颜色 */
     setBasketColor(color) {
         if(this.directionMove){
-            // this.basketRight.getChildByName('back').color = color;
-            // this.basketRight.getChildByName('front').color = color;
-            // this.node.getChildByName('effect').color = color;
-            this.basketRight.getChildByName('back').getComponent(cc.Animation).play("black");
-            this.basketRight.getChildByName('front').getComponent(cc.Animation).play("black");
-            this.node.getChildByName('effect').getComponent(cc.Animation).play("black");
+            this.basketRight.getChildByName('back').color = color;
+            this.basketRight.getChildByName('front').color = color;
+            this.node.getChildByName('effect').color = color;
         }else{
-            // this.basketLeft.getChildByName('back').color = color;
-            // this.basketLeft.getChildByName('front').color = color;
-            // this.node.getChildByName('effect-copy').color = color;
-            this.basketLeft.getChildByName('back').getComponent(cc.Animation).play("black");
-            this.basketLeft.getChildByName('front').getComponent(cc.Animation).play("black");
-            this.node.getChildByName('effect-copy').getComponent(cc.Animation).play("black");
+            this.basketLeft.getChildByName('back').color = color;
+            this.basketLeft.getChildByName('front').color = color;
+            this.node.getChildByName('effect-copy').color = color;
         }
     },
     /**判断进度条是否已经加载完成 */
@@ -211,5 +223,30 @@ cc.Class({
     /**设置分数 */
     setScoreTmp() {
         this.scores.setScore(this.score);
+    },
+    playBgMusic() {
+        this.audio = wx.createInnerAudioContext();
+        this.audio.src = "res/raw-assets/resources/audio/bg2.mp3"
+
+        this.audio.loop = true;
+        wx.onShow(function () {
+            this.audio.play()
+        }.bind(this))
+        wx.onHide(function() {
+            this.audio.pause();
+        }.bind(this))
+        this.audio.play()
+    },
+    onDestroy() {
+        this.audio.stop();
+    },
+    /**是否使用复活卡 */
+    isUseLifeCard() {
+        this.isNext = false;
+        if(window.life_card && window.life_card > 0){
+            
+        }else{
+            this.nextPage();
+        }
     }
 });

@@ -7,9 +7,22 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        this.loadBg();
         this.backHome();
         this.creatToys();
         this.getToys();
+    },
+    /**加载背景图 */
+    loadBg() {
+        let bg = this.node.getChildByName('toysBg');
+        wx.showLoading({title: '加载中',mask: true})
+        cc.loader.load("https://miniapp.tupiaopiao.com/public/image/toysBg.png", function (err, texture) {
+            if(texture){
+                let frame = new cc.SpriteFrame(texture);
+                bg.getComponent(cc.Sprite).spriteFrame = frame;
+                wx.hideLoading();
+            }
+        })
     },
 
     /**返回主场景 */

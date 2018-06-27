@@ -7,6 +7,9 @@ cc.Class({
         this.closePage();
         this.setNum();
         this.invite();
+        wx.showShareMenu({
+            withShareTicket: true
+        })
     },
     /**关闭当前页面 */
     closePage() {
